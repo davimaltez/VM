@@ -1,0 +1,2 @@
+$ ./vm address.txt lru fifo
+Argumentos e arquivos validados
