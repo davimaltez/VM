@@ -31,3 +31,6 @@ main.c:17:11: warning: unused variable ‘algoritmo_pagina’ [-Wunused-variable
       |           ^~~~~~~~~~~~~~~~
 $ ./vm address.txt lru fifo
 Erro: Nao foi possivel abrir o arquivo address.txt
+
+
+

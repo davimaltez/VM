@@ -5,31 +5,46 @@
 
 #define TAMANHO_PAGINA 256
 #define TOTAL_PAGINAS 256
-#define TOTAL_FRAMES 256
+#define TOTAL_FRAMES 128
 
-struct Endereco {
+typedef struct Endereco {
     int pagina;
     int offset;
-};
+}Endereco;
 
-struct GerenciadorVM {
+typedef struct {
+    int anterior;
+    int proximo;
+} Elo;
+
+
+typedef struct GerenciadorVM {
     int tabela_paginas[TOTAL_PAGINAS];
-    char ram[TOTAL_FRAMES * TAMANHO_PAGINA];
+    signed char ram[TOTAL_FRAMES * TAMANHO_PAGINA];
     int proximo_frame;
+
+    int pagina_do_frame[TOTAL_FRAMES];
+
+
+    Elo lista[TOTAL_FRAMES];
+    int primeiro;                        /* frame mais novo da lista */
+    int ultimo;
+    int frames_ocupados;
+
     int total_enderecos;
     int total_page_faults;
-};
+}GerenciadorVM;
 
 
-void inicializar_vm(struct GerenciadorVM *vm);
+void inicializar_vm(GerenciadorVM *vm);
 
 
-struct Endereco quebrar_endereco(int endereco_logico);
+Endereco quebrar_endereco(int endereco_logico);
 
 
-int obter_frame(struct GerenciadorVM *vm, int pagina, FILE *backing_store);
+int obter_frame(GerenciadorVM *vm, int pagina, int move_no_acerto, FILE *disco);
 
 
-char ler_byte_ram(struct GerenciadorVM *vm, int endereco_fisico);
+char ler_byte_ram(GerenciadorVM *vm, int endereco_fisico);
 
 #endif
