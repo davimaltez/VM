@@ -34,3 +34,9 @@ Erro: Nao foi possivel abrir o arquivo address.txt
 
 
 
+$ make
+gcc -Wall main.c validacao.c memoria.c -o vm
+main.c: In function ‘main’:
+main.c:15:11: warning: unused variable ‘algoritmo_tlb’ [-Wunused-variable]
+   15 |     char *algoritmo_tlb = argv[3];
+      |           ^~~~~~~~~~~~~

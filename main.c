@@ -1,10 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "validacao.h"
-
-#include <stdio.h>
-#include "validacao.h"
-
+#include <string.h>
 #include "memoria.h"
 
 int main(int argc, char *argv[]) {
@@ -46,20 +43,28 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    struct GerenciadorVM vm;
+    GerenciadorVM vm;
     inicializar_vm(&vm);
 
     int endereco_virtual = 0;
     while (fscanf(arquivo_entrada, "%d", &endereco_virtual) == 1) {
         vm.total_enderecos++;
 
-        struct Endereco endereco = quebrar_endereco(endereco_virtual);
+        Endereco endereco = quebrar_endereco(endereco_virtual);
 
-        int frame = obter_frame(&vm, endereco.pagina, arquivo_backing_store);
+        int move_no_acerto = (strcmp(algoritmo_pagina, "lru") == 0);
+        int frame = obter_frame(&vm, endereco.pagina, move_no_acerto, arquivo_backing_store);
+
+            if (frame == -1) {
+                fclose(arquivo_entrada);
+                fclose(arquivo_backing_store);
+                fclose(arquivo_saida);
+                return 1;
+            }
 
         int endereco_fisico = (frame * TAMANHO_PAGINA) + endereco.offset;
 
-        char valor_lido = ler_byte_ram(&vm, endereco_fisico);
+        signed char valor_lido = ler_byte_ram(&vm, endereco_fisico);
 
         fprintf(arquivo_saida, "Virtual address: %d Physical address: %d Value: %d\n",
                 endereco_virtual, endereco_fisico, valor_lido);

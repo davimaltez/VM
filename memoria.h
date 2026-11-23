@@ -45,6 +45,6 @@ Endereco quebrar_endereco(int endereco_logico);
 int obter_frame(GerenciadorVM *vm, int pagina, int move_no_acerto, FILE *disco);
 
 
-char ler_byte_ram(GerenciadorVM *vm, int endereco_fisico);
+signed char ler_byte_ram(GerenciadorVM *vm, int endereco_fisico);
 
 #endif
