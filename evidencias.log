@@ -1,2 +1,33 @@
 $ ./vm address.txt lru fifo
 Argumentos e arquivos validados
+
+
+$ make
+gcc -Wall main.c validacao.c -o vm
+main.c: In function ‘main’:
+main.c:28:35: error: ‘nome_arquivo_enderecos’ undeclared (first use in this function); did you mean ‘arquivo_enderecos’?
+   28 |     FILE *arquivo_entrada = fopen(nome_arquivo_enderecos, "r");
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~
+      |                                   arquivo_enderecos
+main.c:28:35: note: each undeclared identifier is reported only once for each function it appears in
+main.c:18:11: warning: unused variable ‘algoritmo_tlb’ [-Wunused-variable]
+   18 |     char *algoritmo_tlb = argv[3];
+      |           ^~~~~~~~~~~~~
+main.c:17:11: warning: unused variable ‘algoritmo_pagina’ [-Wunused-variable]
+   17 |     char *algoritmo_pagina = argv[2];
+      |           ^~~~~~~~~~~~~~~~
+make: *** [Makefile:2: all] Error 1
+
+
+
+$ make
+gcc -Wall main.c validacao.c memoria.c -o vm
+main.c: In function ‘main’:
+main.c:18:11: warning: unused variable ‘algoritmo_tlb’ [-Wunused-variable]
+   18 |     char *algoritmo_tlb = argv[3];
+      |           ^~~~~~~~~~~~~
+main.c:17:11: warning: unused variable ‘algoritmo_pagina’ [-Wunused-variable]
+   17 |     char *algoritmo_pagina = argv[2];
+      |           ^~~~~~~~~~~~~~~~
+$ ./vm address.txt lru fifo
+Erro: Nao foi possivel abrir o arquivo address.txt

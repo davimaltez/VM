@@ -29,6 +29,7 @@ int validar_argumentos(int argc, char *argv[]) {
 int validar_arquivo_enderecos(const char *nome_arquivo) {
 
     FILE *arquivo = fopen(nome_arquivo, "r");
+
     if (arquivo == NULL) {
         fprintf(stderr, "Erro: Nao foi possivel abrir o arquivo %s\n", nome_arquivo);
         return 0;
@@ -38,15 +39,16 @@ int validar_arquivo_enderecos(const char *nome_arquivo) {
     int numero_linha = 0;
 
     while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+            
         numero_linha++;
         int tamanho = strlen(linha);
 
         // Tira o \n ou \r do final da linha
-    while (tamanho > 0 && (linha[tamanho - 1] == '\n' || linha[tamanho - 1] == '\r' ||
-                        linha[tamanho - 1] == ' '  || linha[tamanho - 1] == '\t')) {
+        while (tamanho > 0 && (linha[tamanho - 1] == '\n' || linha[tamanho - 1] == '\r' || linha[tamanho - 1] == ' '  || linha[tamanho - 1] == '\t')) {
                             
             linha[tamanho - 1] = '\0';
             tamanho--;
+            
         }
 
         //Linha em brancoo

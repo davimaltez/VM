@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include "validacao.h"
 
+#include "memoria.h"
+
 int main(int argc, char *argv[]) {
 
     if (!validar_argumentos(argc, argv)) {
@@ -23,7 +25,51 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    printf("Argumentos e arquivos validados\n");
+    FILE *arquivo_entrada = fopen(arquivo_enderecos, "r");
+    if (arquivo_entrada == NULL) {
+        fprintf(stderr, "Erro: Nao foi possivel abrir o arquivo %s\n", arquivo_enderecos);
+        return 1;
+    }
+
+    FILE *arquivo_backing_store = fopen("BACKING_STORE.bin", "rb");
+    if (arquivo_backing_store == NULL) {
+        fprintf(stderr, "Erro: Nao foi possivel abrir o BACKING_STORE.bin\n");
+        fclose(arquivo_entrada);
+        return 1;
+    }
+
+    FILE *arquivo_saida = fopen("correct.txt", "w");
+    if (arquivo_saida == NULL) {
+        fprintf(stderr, "Erro: Nao foi possivel criar o arquivo correct.txt\n");
+        fclose(arquivo_entrada);
+        fclose(arquivo_backing_store);
+        return 1;
+    }
+
+    struct GerenciadorVM vm;
+    inicializar_vm(&vm);
+
+    int endereco_virtual = 0;
+    while (fscanf(arquivo_entrada, "%d", &endereco_virtual) == 1) {
+        vm.total_enderecos++;
+
+        struct Endereco endereco = quebrar_endereco(endereco_virtual);
+
+        int frame = obter_frame(&vm, endereco.pagina, arquivo_backing_store);
+
+        int endereco_fisico = (frame * TAMANHO_PAGINA) + endereco.offset;
+
+        char valor_lido = ler_byte_ram(&vm, endereco_fisico);
+
+        fprintf(arquivo_saida, "Virtual address: %d Physical address: %d Value: %d\n",
+                endereco_virtual, endereco_fisico, valor_lido);
+    }
+
+    printf("Total de enderecos: %d | Page faults: %d\n", vm.total_enderecos, vm.total_page_faults);
+
+    fclose(arquivo_entrada);
+    fclose(arquivo_backing_store);
+    fclose(arquivo_saida);
 
     return 0;
 }
