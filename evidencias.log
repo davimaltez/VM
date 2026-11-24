@@ -40,3 +40,73 @@ main.c: In function ‘main’:
 main.c:15:11: warning: unused variable ‘algoritmo_tlb’ [-Wunused-variable]
    15 |     char *algoritmo_tlb = argv[3];
       |           ^~~~~~~~~~~~~
+
+
+
+############ Testes refeitos na versao final - 24/11/2026 19:11 ############
+(parte dos testes anteriores foi apagada por engano; os blocos abaixo seguem as tentativas do diario)
+
+== Tentativas 1, 2, 7 e 9: tratamento de erro ==
+-- ./vm  --
+Erro: Quantidade de argumentos invalida
+-- ./vm addresses.txt lru --
+Erro: Quantidade de argumentos invalida
+-- ./vm addresses.txt lru fifo extra --
+Erro: Quantidade de argumentos invalida
+-- ./vm addresses.txt abc fifo --
+Erro: Algoritmo de pagina invalido, use fifo ou lru
+-- ./vm addresses.txt lru xyz --
+Erro: Algoritmo de TLB invalido, use fifo ou lru
+-- ./vm addresses.txt LRU fifo --
+Erro: Algoritmo de pagina invalido, use fifo ou lru
+-- ./vm nao_existe.txt lru fifo --
+Erro: Nao foi possivel abrir o arquivo nao_existe.txt
+-- ./vm teste_vazio.txt lru fifo --
+Erro: O arquivo teste_vazio.txt esta vazio.
+-- ./vm teste_branco.txt lru fifo --
+Erro: Linha 2 esta vazia no arquivo teste_branco.txt.
+-- ./vm teste_letras.txt lru fifo --
+Erro: Conteudo invalido na linha 2 (abc). Esperado apenas inteiros.
+-- espacos no fim da linha (deve aceitar) --
+Total de enderecos: 2 | Page faults: 1 | TLB hits: 1
+aceito
+
+== Tentativas 3 a 5: memoria com 128 frames, FIFO e LRU (sem TLB) ==
+-- pagina fifo --
+Total de enderecos: 1000 | Page faults: 538 | TLB hits: 0
+-- pagina lru --
+Total de enderecos: 1000 | Page faults: 539 | TLB hits: 0
+
+== Tentativa 6: TLB (16 entradas) sem threads ==
+-- pagina fifo, TLB fifo --
+Total de enderecos: 1000 | Page faults: 538 | TLB hits: 54
+-- pagina fifo, TLB lru --
+Total de enderecos: 1000 | Page faults: 538 | TLB hits: 55
+-- pagina lru, TLB fifo --
+Total de enderecos: 1000 | Page faults: 539 | TLB hits: 54
+-- pagina lru, TLB lru --
+Total de enderecos: 1000 | Page faults: 539 | TLB hits: 55
+
+== Tentativa 8: TLB com uma thread por entrada ==
+-- pagina fifo, TLB fifo --
+Total de enderecos: 1000 | Page faults: 538 | TLB hits: 54
+mesma saida da versao sem thread
+-- pagina fifo, TLB lru --
+Total de enderecos: 1000 | Page faults: 538 | TLB hits: 55
+mesma saida da versao sem thread
+-- pagina lru, TLB fifo --
+Total de enderecos: 1000 | Page faults: 539 | TLB hits: 54
+mesma saida da versao sem thread
+-- pagina lru, TLB lru --
+Total de enderecos: 1000 | Page faults: 539 | TLB hits: 55
+mesma saida da versao sem thread
+
+== Tentativas 12 e 13: sem TLB, 256 frames (apos o #ifndef no TOTAL_FRAMES) ==
+-- pagina fifo --
+Total de enderecos: 1000 | Page faults: 244 | TLB hits: 0
+-- pagina lru --
+Total de enderecos: 1000 | Page faults: 244 | TLB hits: 0
+
+== Final: lru fifo comparado com o correct.txt do professor ==
+Total de enderecos: 1000 | Page faults: 539 | TLB hits: 54
+IGUAL
