@@ -1,17 +1,19 @@
 #include "tlb.h"
+#include <pthread.h>
 
 void inicializar_tlb(TLB *tlb) {
     for (int i = 0; i < TAMANHO_TLB; i++) {
-        tlb->entradas[i].pagina = -1;
-        tlb->entradas[i].frame = -1;
-        tlb->entradas[i].valida = 0;
+
         tlb->lista[i].anterior = -1;
+        tlb->entradas[i].pagina = -1;
+        tlb->entradas[i].valida = 0;
         tlb->lista[i].proximo = -1;
+        tlb->entradas[i].frame = -1;
     }
 
     tlb->primeiro = -1;
-    tlb->ultimo = -1;
     tlb->hits = 0;
+    tlb->ultimo = -1;
 }
 
 void remover_da_lista_tlb(TLB *tlb, int pos) {
@@ -100,4 +102,49 @@ void invalidar_na_tlb(TLB *tlb, int pagina) {
     tlb->entradas[pos].pagina = -1;
     tlb->entradas[pos].frame = -1;
     tlb->entradas[pos].valida = 0;
+}
+
+void *olhar_entrada(void *arg) {
+    
+    FichaBusca *ficha = (FichaBusca *) arg;
+    EntradaTLB *e = &ficha->tlb->entradas[ficha->posicao];
+
+    if (e->valida == 1 && e->pagina == ficha->pagina) {
+        ficha->achou = 1;
+    } else {
+        ficha->achou = 0;
+    }
+
+    return NULL;
+}
+
+int buscar_na_tlb_threads(TLB *tlb, int pagina) {
+    pthread_t threads[TAMANHO_TLB];
+    FichaBusca fichas[TAMANHO_TLB];
+    int criou[TAMANHO_TLB];
+
+    for (int i = 0; i < TAMANHO_TLB; i++) {
+        fichas[i].tlb = tlb;
+        fichas[i].posicao = i;
+        fichas[i].pagina = pagina;
+        fichas[i].achou = 0;
+
+        criou[i] = (pthread_create(&threads[i], NULL, olhar_entrada, &fichas[i]) == 0);
+    }
+
+    for (int i = 0; i < TAMANHO_TLB; i++) {
+        if (criou[i]) {
+            pthread_join(threads[i], NULL);
+        } else {
+            olhar_entrada(&fichas[i]);
+        }
+    }
+
+    for (int i = 0; i < TAMANHO_TLB; i++) {
+        if (fichas[i].achou == 1) {
+            return i;
+        }
+    }
+
+    return -1;
 }
