@@ -125,3 +125,14 @@ signed char ler_byte_ram(GerenciadorVM *vm, int endereco_fisico) {
     return vm->ram[endereco_fisico];
 
 }
+
+void escrever_estatisticas(FILE *saida, GerenciadorVM *vm, int tlb_hits) {
+    double taxa_faltas = (double) vm->total_page_faults / vm->total_enderecos;
+    double taxa_hits = (double) tlb_hits / vm->total_enderecos;
+
+    fprintf(saida, "Number of Translated Addresses = %d\n", vm->total_enderecos);
+    fprintf(saida, "Page Faults = %d\n", vm->total_page_faults);
+    fprintf(saida, "Page Fault Rate = %.3f\n", taxa_faltas);
+    fprintf(saida, "TLB Hits = %d\n", tlb_hits);
+    fprintf(saida, "TLB Hit Rate = %.3f\n", taxa_hits);
+}

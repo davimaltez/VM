@@ -61,11 +61,13 @@ int main(int argc, char *argv[]) {
         Endereco endereco = quebrar_endereco(endereco_virtual);
 
         int frame;
+        int posicao_tlb;
         int pos_tlb = buscar_na_tlb(&tlb, endereco.pagina);
 
         if (pos_tlb != -1) {
             tlb.hits++;
             frame = tlb.entradas[pos_tlb].frame;
+            posicao_tlb = pos_tlb;
             usar_entrada_tlb(&tlb, pos_tlb, tlb_move_no_acerto);
             usar_frame(&vm, frame, move_no_acerto);
         } else {
@@ -84,18 +86,20 @@ int main(int argc, char *argv[]) {
                 invalidar_na_tlb(&tlb, pagina_removida);
             }
 
-            inserir_na_tlb(&tlb, endereco.pagina, frame);
+            posicao_tlb = inserir_na_tlb(&tlb, endereco.pagina, frame);
         }
 
         int endereco_fisico = (frame * TAMANHO_PAGINA) + endereco.offset;
 
         signed char valor_lido = ler_byte_ram(&vm, endereco_fisico);
 
-        fprintf(arquivo_saida, "Virtual address: %d Physical address: %d Value: %d\n",
-                endereco_virtual, endereco_fisico, valor_lido);
+        fprintf(arquivo_saida, "Virtual address: %d TLB: %d Physical address: %d Value: %d\n",
+                endereco_virtual, posicao_tlb, endereco_fisico, valor_lido);
     }
 
-       printf("Total de enderecos: %d | Page faults: %d | TLB hits: %d\n",
+    escrever_estatisticas(arquivo_saida, &vm, tlb.hits);
+    
+    printf("Total de enderecos: %d | Page faults: %d | TLB hits: %d\n",
            vm.total_enderecos, vm.total_page_faults, tlb.hits);
 
     fclose(arquivo_entrada);

@@ -49,4 +49,5 @@ int obter_frame(GerenciadorVM *vm, int pagina, int move_no_acerto, FILE *disco, 
 signed char ler_byte_ram(GerenciadorVM *vm, int endereco_fisico);
 
 void usar_frame(GerenciadorVM *vm, int frame, int move_no_acerto);
+void escrever_estatisticas(FILE *saida, GerenciadorVM *vm, int tlb_hits);
 #endif

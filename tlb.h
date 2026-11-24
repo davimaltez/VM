@@ -32,7 +32,7 @@ typedef struct {
 void inicializar_tlb(TLB *tlb);
 int buscar_na_tlb(TLB *tlb, int pagina);
 void usar_entrada_tlb(TLB *tlb, int pos, int move_no_acerto);
-void inserir_na_tlb(TLB *tlb, int pagina, int frame);
+int inserir_na_tlb(TLB *tlb, int pagina, int frame);
 void invalidar_na_tlb(TLB *tlb, int pagina);
 int buscar_na_tlb_threads(TLB *tlb, int pagina);
 

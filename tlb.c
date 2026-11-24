@@ -80,10 +80,10 @@ void usar_entrada_tlb(TLB *tlb, int pos, int move_no_acerto) {
     }
 }
 
-void inserir_na_tlb(TLB *tlb, int pagina, int frame) {
+int inserir_na_tlb(TLB *tlb, int pagina, int frame) {
 
     if (tlb->ativa == 0) {
-        return;
+        return -1 ;
     }
 
     int pos = -1;
@@ -105,6 +105,7 @@ void inserir_na_tlb(TLB *tlb, int pagina, int frame) {
     tlb->entradas[pos].valida = 1;
 
     colocar_no_inicio_tlb(tlb, pos);
+    return pos;
 }
 
 void invalidar_na_tlb(TLB *tlb, int pagina) {
