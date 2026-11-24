@@ -13,6 +13,18 @@ void inicializar_tlb(TLB *tlb) {
 
     tlb->primeiro = -1;
     tlb->hits = 0;
+
+    #ifdef SEM_TLB
+    tlb->ativa = 0;
+    #else
+        tlb->ativa = 1;
+    #endif
+
+    #ifdef TLB_THREADS
+        tlb->usa_threads = 1;
+    #else
+        tlb->usa_threads = 0;
+    #endif
     tlb->ultimo = -1;
 }
 
@@ -51,7 +63,7 @@ void colocar_no_inicio_tlb(TLB *tlb, int pos) {
     }
 }
 
-int buscar_na_tlb(TLB *tlb, int pagina) {
+int buscar_sequencial(TLB *tlb, int pagina) {
     for (int i = 0; i < TAMANHO_TLB; i++) {
         if (tlb->entradas[i].valida == 1 && tlb->entradas[i].pagina == pagina) {
             return i;
@@ -69,6 +81,11 @@ void usar_entrada_tlb(TLB *tlb, int pos, int move_no_acerto) {
 }
 
 void inserir_na_tlb(TLB *tlb, int pagina, int frame) {
+
+    if (tlb->ativa == 0) {
+        return;
+    }
+
     int pos = -1;
 
     for (int i = 0; i < TAMANHO_TLB; i++) {
@@ -91,7 +108,7 @@ void inserir_na_tlb(TLB *tlb, int pagina, int frame) {
 }
 
 void invalidar_na_tlb(TLB *tlb, int pagina) {
-    int pos = buscar_na_tlb(tlb, pagina);
+    int pos = buscar_sequencial(tlb, pagina);
 
     if (pos == -1) {
         return;
@@ -105,7 +122,7 @@ void invalidar_na_tlb(TLB *tlb, int pagina) {
 }
 
 void *olhar_entrada(void *arg) {
-    
+
     FichaBusca *ficha = (FichaBusca *) arg;
     EntradaTLB *e = &ficha->tlb->entradas[ficha->posicao];
 
@@ -147,4 +164,16 @@ int buscar_na_tlb_threads(TLB *tlb, int pagina) {
     }
 
     return -1;
+}
+
+int buscar_na_tlb(TLB *tlb, int pagina) {
+    if (tlb->ativa == 0) {
+        return -1;
+    }
+
+    if (tlb->usa_threads == 1) {
+        return buscar_na_tlb_threads(tlb, pagina);
+    }
+
+    return buscar_sequencial(tlb, pagina);
 }

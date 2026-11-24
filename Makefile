@@ -9,3 +9,6 @@ sem_tlb:
 
 sem_tlb_256:
 	gcc -Wall -pthread -DSEM_TLB -DTOTAL_FRAMES=256 main.c validacao.c memoria.c tlb.c politica.c -o vm
+
+clean:
+	rm -f vm

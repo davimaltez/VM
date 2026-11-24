@@ -17,6 +17,8 @@ typedef struct {
     int primeiro;
     int ultimo;
     int hits;
+    int ativa;
+    int usa_threads;
 } TLB;
 
 typedef struct {

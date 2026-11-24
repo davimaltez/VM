@@ -61,13 +61,7 @@ int main(int argc, char *argv[]) {
         Endereco endereco = quebrar_endereco(endereco_virtual);
 
         int frame;
-        #if defined(SEM_TLB)
-                int pos_tlb = -1;
-        #elif defined(TLB_THREADS)
-                int pos_tlb = buscar_na_tlb_threads(&tlb, endereco.pagina);
-        #else
-                int pos_tlb = buscar_na_tlb(&tlb, endereco.pagina);
-        #endif
+        int pos_tlb = buscar_na_tlb(&tlb, endereco.pagina);
 
         if (pos_tlb != -1) {
             tlb.hits++;

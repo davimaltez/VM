@@ -5,7 +5,9 @@
 
 #define TAMANHO_PAGINA 256
 #define TOTAL_PAGINAS 256
+#ifndef TOTAL_FRAMES
 #define TOTAL_FRAMES 128
+#endif
 
 typedef struct Endereco {
     int pagina;
@@ -27,7 +29,7 @@ typedef struct GerenciadorVM {
 
 
     Elo lista[TOTAL_FRAMES];
-    int primeiro;                        /* frame mais novo da lista */
+    int primeiro;                        
     int ultimo;
     int frames_ocupados;
 
