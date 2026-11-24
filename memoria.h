@@ -42,9 +42,9 @@ void inicializar_vm(GerenciadorVM *vm);
 Endereco quebrar_endereco(int endereco_logico);
 
 
-int obter_frame(GerenciadorVM *vm, int pagina, int move_no_acerto, FILE *disco);
-
+int obter_frame(GerenciadorVM *vm, int pagina, int move_no_acerto, FILE *disco, int *pagina_removida);
 
 signed char ler_byte_ram(GerenciadorVM *vm, int endereco_fisico);
 
+void usar_frame(GerenciadorVM *vm, int frame, int move_no_acerto);
 #endif

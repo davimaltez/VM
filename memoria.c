@@ -68,7 +68,10 @@ void colocar_no_inicio(GerenciadorVM *vm, int frame) {
 }
 
 
-int obter_frame(GerenciadorVM *vm, int pagina, int move_no_acerto, FILE *disco) {
+int obter_frame(GerenciadorVM *vm, int pagina, int move_no_acerto, FILE *disco, int * pagina_removida) {
+    
+    *pagina_removida = -1;
+    
     int frame = vm->tabela_paginas[pagina];
 
 
@@ -91,6 +94,7 @@ int obter_frame(GerenciadorVM *vm, int pagina, int move_no_acerto, FILE *disco) 
      else {
         frame = vm->ultimo;     
         tirar_da_lista(vm, frame);
+        *pagina_removida = vm->pagina_do_frame[frame];
         vm->tabela_paginas[vm->pagina_do_frame[frame]] = -1;
     }
 
@@ -106,6 +110,14 @@ int obter_frame(GerenciadorVM *vm, int pagina, int move_no_acerto, FILE *disco) 
     vm->tabela_paginas[pagina] = frame;
     vm->pagina_do_frame[frame] = pagina;
     return frame;
+}
+
+//Usado quando a TLB acerta: a pagina foi usada sem passar pelo obter_frame */
+void usar_frame(GerenciadorVM *vm, int frame, int move_no_acerto) {
+    if (move_no_acerto) {
+        tirar_da_lista(vm, frame);
+        colocar_no_inicio(vm, frame);
+    }
 }
 
 signed char ler_byte_ram(GerenciadorVM *vm, int endereco_fisico) {

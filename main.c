@@ -3,6 +3,7 @@
 #include "validacao.h"
 #include <string.h>
 #include "memoria.h"
+#include "tlb.h"
 
 int main(int argc, char *argv[]) {
 
@@ -46,14 +47,30 @@ int main(int argc, char *argv[]) {
     GerenciadorVM vm;
     inicializar_vm(&vm);
 
+    TLB tlb;
+    inicializar_tlb(&tlb);
+
+    int move_no_acerto = (strcmp(algoritmo_pagina, "lru") == 0);
+    int tlb_move_no_acerto = (strcmp(algoritmo_tlb, "lru") == 0);
+
     int endereco_virtual = 0;
     while (fscanf(arquivo_entrada, "%d", &endereco_virtual) == 1) {
         vm.total_enderecos++;
 
         Endereco endereco = quebrar_endereco(endereco_virtual);
 
-        int move_no_acerto = (strcmp(algoritmo_pagina, "lru") == 0);
-        int frame = obter_frame(&vm, endereco.pagina, move_no_acerto, arquivo_backing_store);
+        int frame;
+        int pos_tlb = buscar_na_tlb(&tlb, endereco.pagina);
+
+        if (pos_tlb != -1) {
+            tlb.hits++;
+            frame = tlb.entradas[pos_tlb].frame;
+            usar_entrada_tlb(&tlb, pos_tlb, tlb_move_no_acerto);
+            usar_frame(&vm, frame, move_no_acerto);
+        } else {
+            int pagina_removida;
+            frame = obter_frame(&vm, endereco.pagina, move_no_acerto,
+                                arquivo_backing_store, &pagina_removida);
 
             if (frame == -1) {
                 fclose(arquivo_entrada);
@@ -61,6 +78,13 @@ int main(int argc, char *argv[]) {
                 fclose(arquivo_saida);
                 return 1;
             }
+
+            if (pagina_removida != -1) {
+                invalidar_na_tlb(&tlb, pagina_removida);
+            }
+
+            inserir_na_tlb(&tlb, endereco.pagina, frame);
+        }
 
         int endereco_fisico = (frame * TAMANHO_PAGINA) + endereco.offset;
 
@@ -70,7 +94,8 @@ int main(int argc, char *argv[]) {
                 endereco_virtual, endereco_fisico, valor_lido);
     }
 
-    printf("Total de enderecos: %d | Page faults: %d\n", vm.total_enderecos, vm.total_page_faults);
+       printf("Total de enderecos: %d | Page faults: %d | TLB hits: %d\n",
+           vm.total_enderecos, vm.total_page_faults, tlb.hits);
 
     fclose(arquivo_entrada);
     fclose(arquivo_backing_store);
