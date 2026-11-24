@@ -4,6 +4,7 @@
 #include <string.h>
 #include "memoria.h"
 #include "tlb.h"
+#include "politica.h"
 
 int main(int argc, char *argv[]) {
 
@@ -50,8 +51,8 @@ int main(int argc, char *argv[]) {
     TLB tlb;
     inicializar_tlb(&tlb);
 
-    int move_no_acerto = (strcmp(algoritmo_pagina, "lru") == 0);
-    int tlb_move_no_acerto = (strcmp(algoritmo_tlb, "lru") == 0);
+    int move_no_acerto = achar_politica(algoritmo_pagina);
+    int tlb_move_no_acerto = achar_politica(algoritmo_tlb);
 
     int endereco_virtual = 0;
     while (fscanf(arquivo_entrada, "%d", &endereco_virtual) == 1) {

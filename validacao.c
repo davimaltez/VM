@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "validacao.h"
+#include "politica.h"
 
 int validar_argumentos(int argc, char *argv[]) {
 
@@ -12,13 +13,13 @@ int validar_argumentos(int argc, char *argv[]) {
     }
 
     // Validação do algoritmo da pagina 
-    if (strcmp(argv[2], "fifo") != 0 && strcmp(argv[2], "lru") != 0) {
+    if (achar_politica(argv[2]) == -1) {
         fprintf(stderr, "Erro: Algoritmo de pagina invalido, use fifo ou lru\n");
         return 0;
     }
 
     // Validação do algoritmo da TLB 
-    if (strcmp(argv[3], "fifo") != 0 && strcmp(argv[3], "lru") != 0) {
+    if (achar_politica(argv[3]) == -1) {
         fprintf(stderr, "Erro: Algoritmo de TLB invalido, use fifo ou lru\n");
         return 0;
     }
